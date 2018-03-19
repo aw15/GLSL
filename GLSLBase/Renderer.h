@@ -7,6 +7,12 @@
 
 #include "Dependencies\glew.h"
 
+struct InputData
+{
+	float position[4];
+	float color[4];
+};
+
 class Renderer
 {
 public:
@@ -31,7 +37,8 @@ private:
 	unsigned int m_WindowSizeX = 0;
 	unsigned int m_WindowSizeY = 0;
 
-	GLuint m_VBO = 0;
+	GLuint m_positionBuffer = 0;
+	GLuint m_colorBuffer = 0;
 	GLuint m_SolidRectShader = 0;
 
 };
