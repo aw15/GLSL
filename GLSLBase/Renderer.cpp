@@ -37,11 +37,15 @@ bool Renderer::IsInitialized()
 void Renderer::CreateVertexBufferObjects()
 {
 
-	float line[]
+	float square[]
 		=
 	{
-		-0.5f,0.0f,0.0f,0.0f,
-		0.5f,0.0f,0.0f,1.0f
+		-0.5f,-0.5f,0.0f,1.0f,
+		-0.5f,0.5f,0.0f,1.0f,
+		0.5f,0.5f,0.0f,1.0f,
+		0.5f,0.5f,0.0f,1.0f,
+		0.5f,-0.5f,0.0f,1.0f,
+		-0.5f,-0.5f,0.0f,1.0f
 	};
 
 	float color[]
@@ -56,7 +60,7 @@ void Renderer::CreateVertexBufferObjects()
 
 	glGenBuffers(1, &m_positionBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
 
 
 	glGenBuffers(1, &m_colorBuffer);
@@ -198,9 +202,9 @@ void Renderer::Lecture3()
 	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_Change");
 	
 	
-	glUniform1f(id, sin(time+=0.005));
+	glUniform1f(id, 0);
 
-	glDrawArrays(GL_LINES, 0, 2);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glDisableVertexAttribArray(attribPosition);
 	glDisableVertexAttribArray(attribColor);

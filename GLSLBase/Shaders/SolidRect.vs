@@ -6,7 +6,7 @@ in vec4 a_Color;
 
 
 uniform float u_Change;
-out float v_Value;
+out vec2 v_Position;
 
 void main()
 {
@@ -15,6 +15,8 @@ void main()
 
 	gl_Position = a_Position;
 	gl_Position.w = 1.0;
+		
 
-	v_Value = a_Position.w;
+	v_Position = vec2(a_Position.x,a_Position.y);
+	
 }
