@@ -37,12 +37,11 @@ bool Renderer::IsInitialized()
 void Renderer::CreateVertexBufferObjects()
 {
 
-	float triangleVec4[]
+	float line[]
 		=
 	{
-		0.0f,1.0f,0.0f,1.0f,
-		1.0f,0.0f,0.0f,1.0f,
-		0.0f,0.0f,0.0f,1.0f,
+		-0.5f,0.0f,0.0f,0.0f,
+		0.5f,0.0f,0.0f,1.0f
 	};
 
 	float color[]
@@ -57,7 +56,7 @@ void Renderer::CreateVertexBufferObjects()
 
 	glGenBuffers(1, &m_positionBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVec4), triangleVec4, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
 
 
 	glGenBuffers(1, &m_colorBuffer);
@@ -98,6 +97,7 @@ void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
 
 	// ShaderProgram ¿¡ attach!!
 	glAttachShader(ShaderProgram, ShaderObj);
+	
 }
 
 bool Renderer::ReadFile(char* filename, std::string *target)
@@ -174,7 +174,7 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 
 	return ShaderProgram;
 }
-
+float time = 0;
 void Renderer::Lecture3()
 {
 
@@ -195,12 +195,12 @@ void Renderer::Lecture3()
 	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_Scale");
+	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_Change");
 	
-	glUniform1f(id, 0.7);
+	
+	glUniform1f(id, sin(time+=0.005));
 
-
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_LINES, 0, 2);
 
 	glDisableVertexAttribArray(attribPosition);
 	glDisableVertexAttribArray(attribColor);
