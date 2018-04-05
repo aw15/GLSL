@@ -1,22 +1,20 @@
 #version 330
 
 in vec4 a_Position;
-in vec4 a_Color;
 
 
+uniform float u_time;
 
-uniform float u_Change;
-out vec2 v_Position;
+
 
 void main()
 {
-	//gl_Position = vec4(a_Position, 1);
-	
+	float xValue = a_Position.x;
+	float yValue = sin(a_Position.x * 3.1415*1+u_time) *(a_Position.x+1)/2;
 
 	gl_Position = a_Position;
-	gl_Position.w = 1.0;
-		
+	gl_Position.y = yValue;
 
-	v_Position = vec2(a_Position.x,a_Position.y);
-	
+	//gl_Position.y = sin(gl_Position.x * 3.1415*1+u_time) *(gl_Position.x+1)/2;
+	//gl_Position.y = sin(gl_Position.x * 3.1415*3+u_time) *(1-(gl_Position.x+1)/2);
 }

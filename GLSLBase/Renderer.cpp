@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "Renderer.h"
+#include<chrono>
+const float pointCount = 50;
+
 
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
@@ -37,35 +40,23 @@ bool Renderer::IsInitialized()
 void Renderer::CreateVertexBufferObjects()
 {
 
-	float square[]
-		=
+
+
+
+
+	float* Points = new float[(pointCount + 1) * 4];
+	for (int i = 0; i <= pointCount; i++)
 	{
-		-0.5f,-0.5f,0.0f,1.0f,
-		-0.5f,0.5f,0.0f,1.0f,
-		0.5f,0.5f,0.0f,1.0f,
-		0.5f,0.5f,0.0f,1.0f,
-		0.5f,-0.5f,0.0f,1.0f,
-		-0.5f,-0.5f,0.0f,1.0f
-	};
-
-	float color[]
-		=
-	{
-		1.0f,1.0f,1.0f,1.0f,
-		1.0f,1.0f,1.0f,1.0f,
-		1.0f,1.0f,1.0f,1.0f,
-	};
+		Points[i * 4 + 0] = (i / (float)pointCount) * 2 - 1;
+		Points[i * 4 + 1] = 0;
+		Points[i * 4 + 2] = 0;
+		Points[i * 4 + 3] = 1;
+	}
 
 
-
-	glGenBuffers(1, &m_positionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_positionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-
-
-	glGenBuffers(1, &m_colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, (sizeof(float)*4)*(pointCount+1), Points, GL_STATIC_DRAW);
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -178,38 +169,29 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 
 	return ShaderProgram;
 }
-float time = 0;
+auto g_time = std::chrono::high_resolution_clock::now();
+
 void Renderer::Lecture3()
 {
-
 	glUseProgram(m_SolidRectShader);
 
 	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-	int attribColor = glGetAttribLocation(m_SolidRectShader, "a_Color");
 
 	glEnableVertexAttribArray(attribPosition);
-	glBindBuffer(GL_ARRAY_BUFFER, m_positionBuffer);
-	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
 
-
-
-
-	glEnableVertexAttribArray(attribColor);
-	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
-	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-
-	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_Change");
+	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_time");
 	
 	
-	glUniform1f(id, 0);
+	
+	std::chrono::duration<double> diff = std::chrono::high_resolution_clock::now() - g_time;
+	glUniform1f(id, diff.count());
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glPointSize(10.0f);
+	glDrawArrays(GL_LINE_STRIP, 0, pointCount);
 
 	glDisableVertexAttribArray(attribPosition);
-	glDisableVertexAttribArray(attribColor);
-
 	
-
 
 }
