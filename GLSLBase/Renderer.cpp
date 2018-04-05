@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include<chrono>
-const float pointCount = 50;
+const float pointCount = 500;
 
 
 Renderer::Renderer(int windowSizeX, int windowSizeY)
@@ -48,15 +48,20 @@ void Renderer::CreateVertexBufferObjects()
 	for (int i = 0; i <= pointCount; i++)
 	{
 		Points[i * 4 + 0] = (i / (float)pointCount) * 2 - 1;
-		Points[i * 4 + 1] = 0;
-		Points[i * 4 + 2] = 0;
+		Points[i * 4 + 1] = (float)rand()/(float)RAND_MAX;
+		Points[i * 4 + 2] = (float)rand() / (float)RAND_MAX;
 		Points[i * 4 + 3] = 1;
+		if ((float)rand() / (float)RAND_MAX > 0.5f)
+		{
+			Points[i * 4 + 0] *= -1;
+		}
 	}
-
+	
+	//float point[4] = { -1,0,0,1 };
 
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, (sizeof(float)*4)*(pointCount+1), Points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*4*(pointCount+1), Points, GL_STATIC_DRAW);
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -169,8 +174,8 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 
 	return ShaderProgram;
 }
-auto g_time = std::chrono::high_resolution_clock::now();
-
+auto start = std::chrono::high_resolution_clock::now();
+float g_time = 0.0f;
 void Renderer::Lecture3()
 {
 	glUseProgram(m_SolidRectShader);
@@ -179,17 +184,22 @@ void Renderer::Lecture3()
 
 	glEnableVertexAttribArray(attribPosition);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
+	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_time");
 	
 	
 	
-	std::chrono::duration<double> diff = std::chrono::high_resolution_clock::now() - g_time;
-	glUniform1f(id, diff.count());
+	//std::chrono::duration<double> diff = std::chrono::high_resolution_clock::now() - start;
+
+	g_time += 0.002f;
+	if (1.0 < g_time)
+		g_time = -1.0f;
+	glUniform1f(id, g_time);
+	
 
 	glPointSize(10.0f);
-	glDrawArrays(GL_LINE_STRIP, 0, pointCount);
+	glDrawArrays(GL_POINTS, 0, pointCount);
 
 	glDisableVertexAttribArray(attribPosition);
 	
