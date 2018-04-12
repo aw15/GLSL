@@ -21,7 +21,7 @@ public:
 
 	bool IsInitialized();
 	void Test();
-
+	void ProcessInput(float x, float y);
 	void Lecture3();
 
 private:
@@ -30,12 +30,14 @@ private:
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 	GLuint CompileShaders(char* filenameVS, char* filenameFS);
 	void CreateVertexBufferObjects();
-	void GetGLPosition(float x, float y, float *newX, float *newY);
+
 
 	bool m_Initialized = false;
 	
 	unsigned int m_WindowSizeX = 0;
 	unsigned int m_WindowSizeY = 0;
+
+	float m_mouseX=0, m_mouseY=0;
 
 	GLuint m_VBO = 0;
 	GLuint m_colorBuffer = 0;

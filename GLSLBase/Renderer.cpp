@@ -3,12 +3,10 @@
 #include<chrono>
 const float pointCount = 500;
 
-
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
 }
-
 
 Renderer::~Renderer()
 {
@@ -62,6 +60,13 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*4*(pointCount+1), Points, GL_STATIC_DRAW);
+}
+
+void Renderer::ProcessInput(float x, float y)
+{
+	m_mouseX = (x - 250)/250.0f;
+	m_mouseY = (-y+250)/250.0f;
+	std::cout << m_mouseX << " " << m_mouseY;
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -187,18 +192,16 @@ void Renderer::Lecture3()
 	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_time");
-	
-	
-	
-	//std::chrono::duration<double> diff = std::chrono::high_resolution_clock::now() - start;
-
 	g_time += 0.002f;
-	if (1.0 < g_time)
-		g_time = -1.0f;
+
 	glUniform1f(id, g_time);
 	
+	id = glGetUniformLocation(m_SolidRectShader, "origin");
+	glUniform2f(id, 0, 0);
+	id = glGetUniformLocation(m_SolidRectShader, "end");
+	glUniform2f(id, m_mouseX, m_mouseY);
 
-	glPointSize(10.0f);
+	glPointSize(1.0f);
 	glDrawArrays(GL_POINTS, 0, pointCount);
 
 	glDisableVertexAttribArray(attribPosition);

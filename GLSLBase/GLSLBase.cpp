@@ -36,6 +36,7 @@ void Idle(void)
 void MouseInput(int button, int state, int x, int y)
 {
 	RenderScene();
+	g_Renderer->ProcessInput(x, y);
 }
 
 void KeyInput(unsigned char key, int x, int y)
