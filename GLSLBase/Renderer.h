@@ -20,17 +20,15 @@ public:
 	~Renderer();
 
 	bool IsInitialized();
-	void Test();
 	void ProcessInput(float x, float y);
-	void Lecture3();
+	void FragmentSpline();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 	GLuint CompileShaders(char* filenameVS, char* filenameFS);
-	void CreateVertexBufferObjects();
-
+	void CreateBufferObjects();
 
 	bool m_Initialized = false;
 	
@@ -42,6 +40,5 @@ private:
 	GLuint m_VBO = 0;
 	GLuint m_colorBuffer = 0;
 	GLuint m_SolidRectShader = 0;
-
 };
 

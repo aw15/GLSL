@@ -26,7 +26,7 @@
     <None Include="Shaders\SolidRect.vs">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shaders\SolidRect.fs">
+    <None Include="Shaders\SolidRect.ps">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
