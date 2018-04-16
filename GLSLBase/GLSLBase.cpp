@@ -16,15 +16,23 @@ but WITHOUT ANY WARRANTY.
 #include "Renderer.h"
 
 Renderer *g_Renderer = NULL;
-
+float g_time = 0;
 
 void RenderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	g_time += 0.002;
+	float centers[] =
+	{
+		-0.4,-1
+		,1,0.5,
+		-1,1,
+		1,-1
+	};
 
 	// Renderer Test
-	g_Renderer->FragmentSpline();
+	g_Renderer->FragmentSpline(centers,g_time);
 	
 	glutSwapBuffers();
 }

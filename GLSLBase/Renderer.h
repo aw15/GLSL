@@ -21,7 +21,7 @@ public:
 
 	bool IsInitialized();
 	void ProcessInput(float x, float y);
-	void FragmentSpline();
+	void FragmentSpline(float* center, float time);
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);

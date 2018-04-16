@@ -170,9 +170,9 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 
 	return ShaderProgram;
 }
-float gtime = 0;
 
-void Renderer::FragmentSpline()
+
+void Renderer::FragmentSpline(float* center,float time)
 {
 	glUseProgram(m_SolidRectShader);
 
@@ -182,10 +182,13 @@ void Renderer::FragmentSpline()
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-	gtime += 0.002;
+	
 
 	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_time");
-	glUniform1f(id, gtime);
+	glUniform1f(id, time);
+
+	id = glGetUniformLocation(m_SolidRectShader, "u_center");
+	glUniform2fv(id, 4, center);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
