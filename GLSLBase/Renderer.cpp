@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include<chrono>
-const float pointCount = 100;
+
 
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
@@ -27,6 +27,13 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	{
 		m_Initialized = true;
 	}
+/*
+	Bullet* bullet = new Bullet{ 0.01f,0.75f, 0.0f,0.0f };
+	Bullet* bullet2 = new Bullet{ 0.005f,0.35f, 0.0f,0.0f };
+	bullets.push_back(bullet);
+	bullets.push_back(bullet2);*/
+
+
 }
 
 bool Renderer::IsInitialized()
@@ -35,23 +42,16 @@ bool Renderer::IsInitialized()
 }
 
 
+
+
 void Renderer::CreateBufferObjects()
 {
-	float square[]
-		=
-	{
-		-1.0f,-1.0f,0.0f,1.0f,
-		-1.0f,1.0f,0.0f,1.0f,
-		1.0f,1.0f,0.0f,1.0f,
-		1.0f,1.0f,0.0f,1.0f,
-		1.0f,-1.0f,0.0f,1.0f,
-		-1.0f,-1.0f,0.0f,1.0f
-	};
+	
 
 
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 }
 
 void Renderer::ProcessInput(float x, float y)
@@ -172,27 +172,185 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 }
 
 
-void Renderer::FragmentSpline(float* center,float time)
+float fireRate = 0;
+
+
+void BasicSpiral(float time, vector<Bullet*>& bullets)
+{
+
+	static float shotAngle = 0.25;
+	static float shotAngleRate = 0.02;
+
+	fireRate += time;
+
+	if (fireRate > 0.5)
+	{
+		Bullet* newBullet = new Bullet(0.1, shotAngle, 0, 0);
+		bullets.push_back(newBullet);
+		fireRate = 0;
+		shotAngle += shotAngleRate;
+		shotAngle -= floor(shotAngle);
+	}
+}
+
+void MultiSpiral(float time, vector<Bullet*>& bullets)
+{
+	static float shotAngle = 0.25;
+	static float shotAngleRate = 0.05;
+	fireRate += time;
+	static int count = 10;
+	if (fireRate>0.5 )
+	//if(count!=0)
+	{	
+		count--;
+		for (int i = 0; i < 4; i++)
+		{
+			Bullet* newBullet = new Bullet(0.3, shotAngle+(float)i/4, 0, 0);
+			bullets.push_back(newBullet);	
+		}
+		shotAngle += shotAngleRate;
+		shotAngle -= floor(shotAngle);
+		fireRate = 0;
+	}
+}
+
+void DualDirectionMultiSpiral(float time, vector<Bullet*>& bullets)
+{
+	static float shotAngle[2] = { 0.25,0.25 };
+	static float shotAngleRate[2] = { 0.15,-0.1 };
+	fireRate += time;
+	static int count = 10;
+	if (fireRate>0.5)
+		//if(count!=0)
+	{
+		count--;
+		for (int j = 0; j < 2; j++)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				Bullet* newBullet = new Bullet(0.3, shotAngle[j] + (float)i / 4, 0, 0);
+				bullets.push_back(newBullet);
+			}
+			shotAngle[j] += shotAngleRate[j];
+			shotAngle[j] -= floor(shotAngle[j]);
+		}
+		fireRate = 0;
+	}
+}
+
+void LinearMultiSpiral(float time, vector<Bullet*>& bullets)
+{
+	static float shotAngle = 0;
+	static float shotAngleRate = 0.02;
+	static float speed = 0.3;
+	static float bullet_angleRate = -0.00003;
+	static float bullet_speedRate = 0;
+	static float interval = 1;
+
+	fireRate += time;
+	static int count = 10;
+	if (fireRate>interval)
+		//if(count!=0)
+	{
+		count--;
+		Bullet* newBullet = new Bullet(speed, shotAngle, bullet_speedRate, bullet_angleRate, {1,0,0});
+			bullets.push_back(newBullet);
+
+			shotAngle += shotAngleRate;
+			shotAngle -= floor(shotAngle);
+
+		fireRate = 0;
+	}
+}
+
+void easyWasherSprial(float time, vector<Bullet*>& bullets)
+{
+	static float shotAngle =  0.25;
+	static float speed = 0.3;
+	static float totalframe = 0;
+	static int count = 10;
+
+	float shotAngleRate = 0.3;
+	float bullet_angleRate = -0.00003;
+	float bullet_speedRate = 0;
+	float interval = 0.5;
+
+	if (totalframe < 1)
+	{
+		shotAngleRate = 0.05;
+	}
+	if (totalframe > 1)
+	{
+		shotAngleRate = -0.05;
+	}
+	if(totalframe > 2)
+	{
+		totalframe = 0;
+	}
+	totalframe+=time;
+	fireRate += time;
+	
+	cout << totalframe << " " << shotAngleRate << endl;
+	if (fireRate>interval)
+		//if(count!=0)
+	{
+		count--;
+		for (int i = 0; i < 4; i++)
+		{
+			Bullet* newBullet = new Bullet(speed, shotAngle + (float)i / 4, 0, 0);
+			bullets.push_back(newBullet);
+		}
+		shotAngle += shotAngleRate;
+		shotAngle -= floor(shotAngle);
+
+		fireRate = 0;
+	}
+}
+
+void Renderer::FragmentSpline(float time)
 {
 	glUseProgram(m_SolidRectShader);
 
-	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
 
-	glEnableVertexAttribArray(attribPosition);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	//BasicSpiral(time,bullets);
+	  //      MultiSpiral(time, bullets);
+	//DualDirectionMultiSpiral(time, bullets);
+	//LinearMultiSpiral(time, bullets);
+	easyWasherSprial(time, bullets);
 
-	
 
-	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_time");
-	glUniform1f(id, time);
+	for (auto iter = bullets.begin();iter!=bullets.end();)
+	{
+		auto bullet = *iter;
+		bullet->Move(time);
 
-	id = glGetUniformLocation(m_SolidRectShader, "u_center");
-	glUniform2fv(id, 4, center);
+		int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+		glEnableVertexAttribArray(attribPosition);
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glDisableVertexAttribArray(attribPosition);
-	
+		Transform worldPosition = bullet->position;
+		GLuint id = glGetUniformLocation(m_SolidRectShader, "worldPosition");
+		glUniform3f(id, worldPosition.x, worldPosition.y, worldPosition.z);
+		Transform color = bullet->color;
+		id = glGetUniformLocation(m_SolidRectShader, "u_color");
+		glUniform3f(id, color.x, color.y, color.z);
+
+		glPointSize(10);
+		glDrawArrays(GL_POINTS, 0, 4);
+
+		glDisableVertexAttribArray(attribPosition);
+		if (bullet->outRange())
+		{
+			iter = bullets.erase(iter);
+			delete bullet;
+			bullet = nullptr;
+		}
+		else
+		{
+			iter++;
+		}
+	}
 
 }
