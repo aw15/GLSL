@@ -22,6 +22,7 @@ public:
 	bool IsInitialized();
 	void ProcessInput(float x, float y);
 	void FragmentSpline(float* center, float time);
+	void FillAll(float r, float g, float b,float a);
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -38,7 +39,7 @@ private:
 	float m_mouseX=0, m_mouseY=0;
 
 	GLuint m_VBO = 0;
-	GLuint m_colorBuffer = 0;
 	GLuint m_SolidRectShader = 0;
+	GLuint m_FillAllShader = 0;
 };
 

@@ -20,6 +20,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	//Load shaders
 	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.ps");
+	m_FillAllShader = CompileShaders("./Shaders/FillAll.vs", "./Shaders/FillAll.ps");
 	//Create VBOs
 	CreateBufferObjects();
 
@@ -175,6 +176,7 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 void Renderer::FragmentSpline(float* center,float time)
 {
 	glUseProgram(m_SolidRectShader);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
 
@@ -190,9 +192,31 @@ void Renderer::FragmentSpline(float* center,float time)
 	id = glGetUniformLocation(m_SolidRectShader, "u_center");
 	glUniform2fv(id, 4, center);
 
+
+
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glDisableVertexAttribArray(attribPosition);
-	
 
+
+}
+
+void Renderer::FillAll(float r, float g, float b,float a)
+{
+	glUseProgram(m_FillAllShader);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	int attribPosition = glGetAttribLocation(m_FillAllShader, "a_Position");
+
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	GLuint id = glGetUniformLocation(m_FillAllShader, "u_color");
+	glUniform4f(id, r, g, b,a);
+
+	glDisableVertexAttribArray(attribPosition);
+	glDisable(GL_BLEND);
 }

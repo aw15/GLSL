@@ -1,0 +1,38 @@
+#version 330
+
+layout(location=0) out vec4 FragColor;
+in vec2 v_Pos;
+
+uniform float u_time;
+uniform vec2 u_center[4];
+uniform vec3 u_color;
+float pi = 3.141592;
+
+void main()
+{
+
+
+
+	float weight = 0;
+	for(int i =0;i<4;i++)
+	{
+	float distance = length(v_Pos - u_center[i]);
+	if(distance<0.5f)
+		weight +=0.3;
+	}
+
+	float distance1 = length(v_Pos);
+	float u_time = fract(u_time/2)*2;
+	float finalColor = 0;
+
+	if(distance1>u_time-0.02&&distance1<u_time+0.02)
+	{
+		finalColor = 1*weight+0.2;
+	}
+	else
+	{
+		discard;
+	}
+
+	FragColor = vec4(finalColor);
+}

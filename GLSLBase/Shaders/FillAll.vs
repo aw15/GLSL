@@ -7,5 +7,4 @@ void main()
 {
 	v_Pos = a_Position.xy;
 	gl_Position = a_Position;
-
 }

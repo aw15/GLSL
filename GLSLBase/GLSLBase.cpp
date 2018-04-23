@@ -25,14 +25,15 @@ void RenderScene(void)
 	g_time += 0.002;
 	float centers[] =
 	{
-		-0.4,-1
+		-0.5,-0.5
 		,1,0.5,
 		-1,1,
 		1,-1
 	};
 
 	// Renderer Test
-	g_Renderer->FragmentSpline(centers,g_time);
+	g_Renderer->FillAll(0.2,0.2,0.2,0.2);
+	//g_Renderer->FragmentSpline(centers,g_time);
 	
 	glutSwapBuffers();
 }
