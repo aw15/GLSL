@@ -47,12 +47,37 @@ bool Renderer::IsInitialized()
 
 void Renderer::CreateBufferObjects()
 {
-	
-
+	points[0] = { -0.5f,0.5f,0.0f,0.0f,1.0f };
+	points[1] = { -0.5f,-0.5f,0.0f,0.0f,0.0f };
+	points[2] = { 0.5f,0.5f,0.0f,1.0f,1.0f };
+	points[3] = { 0.5f,0.5f,0.0f,1.0f,1.0f };
+	points[4] = { -0.5f,-0.5f,0.0f,0.0f,0.0f };
+	points[5] = { 0.5f,-0.5f,0.0f,1.0f,0.0f };
 
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+
+	static const GLulong checkerboard[] =
+	{
+		0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+		0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF,
+		0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+		0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF,
+		0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+		0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF,
+		0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
+		0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF
+	};
+	
+	glGenTextures(1, &m_texCheckerBoard);
+	glBindTexture(GL_TEXTURE_2D, m_texCheckerBoard);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE,(void*)checkerboard);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 }
 
 void Renderer::ProcessInput(float x, float y)
@@ -173,219 +198,30 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 }
 
 
-float fireRate = 0;
-
-
-void BasicSpiral(float time, vector<Bullet*>& bullets)
-{
-<<<<<<< HEAD
-	glUseProgram(m_SolidRectShader);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-=======
->>>>>>> d105241d9854bc83512fb90f3c2359f5803f2d01
-
-	static float shotAngle = 0.25;
-	static float shotAngleRate = 0.02;
-
-	fireRate += time;
-
-	if (fireRate > 0.5)
-	{
-		Bullet* newBullet = new Bullet(0.1, shotAngle, 0, 0);
-		bullets.push_back(newBullet);
-		fireRate = 0;
-		shotAngle += shotAngleRate;
-		shotAngle -= floor(shotAngle);
-	}
-}
-
-void MultiSpiral(float time, vector<Bullet*>& bullets)
-{
-	static float shotAngle = 0.25;
-	static float shotAngleRate = 0.05;
-	fireRate += time;
-	static int count = 10;
-	if (fireRate>0.5 )
-	//if(count!=0)
-	{	
-		count--;
-		for (int i = 0; i < 4; i++)
-		{
-			Bullet* newBullet = new Bullet(0.3, shotAngle+(float)i/4, 0, 0);
-			bullets.push_back(newBullet);	
-		}
-		shotAngle += shotAngleRate;
-		shotAngle -= floor(shotAngle);
-		fireRate = 0;
-	}
-}
-
-void DualDirectionMultiSpiral(float time, vector<Bullet*>& bullets)
-{
-	static float shotAngle[2] = { 0.25,0.25 };
-	static float shotAngleRate[2] = { 0.15,-0.1 };
-	fireRate += time;
-	static int count = 10;
-	if (fireRate>0.5)
-		//if(count!=0)
-	{
-		count--;
-		for (int j = 0; j < 2; j++)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				Bullet* newBullet = new Bullet(0.3, shotAngle[j] + (float)i / 4, 0, 0);
-				bullets.push_back(newBullet);
-			}
-			shotAngle[j] += shotAngleRate[j];
-			shotAngle[j] -= floor(shotAngle[j]);
-		}
-		fireRate = 0;
-	}
-}
-
-void LinearMultiSpiral(float time, vector<Bullet*>& bullets)
-{
-	static float shotAngle = 0;
-	static float shotAngleRate = 0.02;
-	static float speed = 0.3;
-	static float bullet_angleRate = -0.00003;
-	static float bullet_speedRate = 0;
-	static float interval = 1;
-
-	fireRate += time;
-	static int count = 10;
-	if (fireRate>interval)
-		//if(count!=0)
-	{
-		count--;
-		Bullet* newBullet = new Bullet(speed, shotAngle, bullet_speedRate, bullet_angleRate, {1,0,0});
-			bullets.push_back(newBullet);
-
-			shotAngle += shotAngleRate;
-			shotAngle -= floor(shotAngle);
-
-		fireRate = 0;
-	}
-}
-
-void easyWasherSprial(float time, vector<Bullet*>& bullets)
-{
-	static float shotAngle =  0.25;
-	static float speed = 0.3;
-	static float totalframe = 0;
-	static int count = 10;
-
-<<<<<<< HEAD
-
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	glDisableVertexAttribArray(attribPosition);
-=======
-	float shotAngleRate = 0.3;
-	float bullet_angleRate = -0.00003;
-	float bullet_speedRate = 0;
-	float interval = 0.5;
-
-	if (totalframe < 1)
-	{
-		shotAngleRate = 0.05;
-	}
-	if (totalframe > 1)
-	{
-		shotAngleRate = -0.05;
-	}
-	if(totalframe > 2)
-	{
-		totalframe = 0;
-	}
-	totalframe+=time;
-	fireRate += time;
-	
-	cout << totalframe << " " << shotAngleRate << endl;
-	if (fireRate>interval)
-		//if(count!=0)
-	{
-		count--;
-		for (int i = 0; i < 4; i++)
-		{
-			Bullet* newBullet = new Bullet(speed, shotAngle + (float)i / 4, 0, 0);
-			bullets.push_back(newBullet);
-		}
-		shotAngle += shotAngleRate;
-		shotAngle -= floor(shotAngle);
-
-		fireRate = 0;
-	}
-}
 
 void Renderer::FragmentSpline(float time)
 {
 	glUseProgram(m_SolidRectShader);
 
-
-	//BasicSpiral(time,bullets);
-	  //      MultiSpiral(time, bullets);
-	//DualDirectionMultiSpiral(time, bullets);
-	//LinearMultiSpiral(time, bullets);
-	easyWasherSprial(time, bullets);
+	GLuint uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot");
+	glUniform1i(uniformSampler, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_texCheckerBoard);
 
 
-	for (auto iter = bullets.begin();iter!=bullets.end();)
-	{
-		auto bullet = *iter;
-		bullet->Move(time);
+	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	int attribUV = glGetAttribLocation(m_SolidRectShader, "a_uv");
+	glEnableVertexAttribArray(attribPosition);//꼭 enable해서 활성화하자
+	glEnableVertexAttribArray(attribUV);
 
-		int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-
-		glEnableVertexAttribArray(attribPosition);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-		Transform worldPosition = bullet->position;
-		GLuint id = glGetUniformLocation(m_SolidRectShader, "worldPosition");
-		glUniform3f(id, worldPosition.x, worldPosition.y, worldPosition.z);
-		Transform color = bullet->color;
-		id = glGetUniformLocation(m_SolidRectShader, "u_color");
-		glUniform3f(id, color.x, color.y, color.z);
-
-		glPointSize(10);
-		glDrawArrays(GL_POINTS, 0, 4);
-
-		glDisableVertexAttribArray(attribPosition);
-		if (bullet->outRange())
-		{
-			iter = bullets.erase(iter);
-			delete bullet;
-			bullet = nullptr;
-		}
-		else
-		{
-			iter++;
-		}
-	}
->>>>>>> d105241d9854bc83512fb90f3c2359f5803f2d01
-
-
-}
-
-void Renderer::FillAll(float r, float g, float b,float a)
-{
-	glUseProgram(m_FillAllShader);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	int attribPosition = glGetAttribLocation(m_FillAllShader, "a_Position");
-
-	glEnableVertexAttribArray(attribPosition);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), 0);
+	glVertexAttribPointer(attribUV, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(3 * sizeof(float)));
 
 
-	GLuint id = glGetUniformLocation(m_FillAllShader, "u_color");
-	glUniform4f(id, r, g, b,a);
+
+	glDrawArrays(GL_TRIANGLES, 0, POINT_COUNT);
 
 	glDisableVertexAttribArray(attribPosition);
-	glDisable(GL_BLEND);
+	glDisableVertexAttribArray(attribUV);
 }

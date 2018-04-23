@@ -23,27 +23,13 @@ void RenderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-<<<<<<< HEAD
-	g_time += 0.002;
-	float centers[] =
-	{
-		-0.5,-0.5
-		,1,0.5,
-		-1,1,
-		1,-1
-	};
 
-	// Renderer Test
-	g_Renderer->FillAll(0.2,0.2,0.2,0.2);
-	//g_Renderer->FragmentSpline(centers,g_time);
-=======
 	auto end = chrono::high_resolution_clock::now();
 	chrono::duration<double> diff = end - start;
 	start = end;
 
 	// Renderer Test
 	g_Renderer->FragmentSpline(diff.count());
->>>>>>> d105241d9854bc83512fb90f3c2359f5803f2d01
 	
 	glutSwapBuffers();
 }
