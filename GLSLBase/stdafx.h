@@ -7,4 +7,5 @@
 #include<chrono>
 #include<random>
 #include<iostream>
+#include<Windows.h>
 using namespace std;

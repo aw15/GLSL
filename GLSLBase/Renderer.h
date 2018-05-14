@@ -9,16 +9,6 @@
 #define POINT_COUNT 6
 #define PI 3.141592
 
-struct Point
-{
-	float x;
-	float y;
-	float z;
-};
-struct UV
-{
-	
-};
 
 struct VertexData
 {
@@ -41,7 +31,6 @@ public:
 
 	bool IsInitialized();
 	void ProcessInput(float x, float y);
-	void FillAll(float r, float g, float b,float a);
 	void FragmentSpline(float time);
 
 private:
@@ -64,7 +53,10 @@ private:
 	GLuint m_FillAllShader = 0;
 	GLuint m_VBOPosTex = 0;
 
-	GLuint m_texCheckerBoard=0;
+	GLuint gTextureIDTotal =0;
+	GLuint brickTexture=0;
+	GLuint skyTexture = 0;
+
 	char* data;
 	VertexData points[POINT_COUNT];
 };

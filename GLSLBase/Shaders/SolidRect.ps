@@ -3,11 +3,12 @@
 layout(location=0) out vec4 FragColor;
 in vec2 v_uv;
 
-float pi = 3.141592;
+uniform int u_time;
 uniform sampler2D u_TextureSlot;
 
 void main()
 {
-	//FragColor = vec4(v_uv,1,1);
-	FragColor = texture(u_TextureSlot, v_uv);
-}
+	float tx = (v_uv.x);
+	float ty = (v_uv.y)/6.0f+u_time/6.0f;
+	FragColor = texture(u_TextureSlot, vec2(tx,ty));
+} 
