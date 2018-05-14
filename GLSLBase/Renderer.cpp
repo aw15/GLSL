@@ -67,7 +67,6 @@ unsigned char * loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsig
 }
 
 
-
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
@@ -106,7 +105,6 @@ bool Renderer::IsInitialized()
 {
 	return m_Initialized;
 }
-
 
 
 
@@ -190,15 +188,25 @@ void Renderer::CreateBufferObjects()
 
 	unsigned int x = 0;
 	unsigned int y = 0;
-	unsigned char* brick = loadBMPRaw("../brick.bmp", x, y);
-	glGenTextures(1, &brickTexture);
-	glBindTexture(GL_TEXTURE_2D, brickTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 48, 0, GL_RGBA, GL_UNSIGNED_BYTE, brick);
+	unsigned char* brick = loadBMPRaw("brick.bmp", x, y);
+	MakeTexture(brick, brickTexture, x, y);
+
+	x = 0;
+	y = 0;
+	unsigned char* sky = loadBMPRaw("sky.bmp", x, y);
+	MakeTexture(sky, skyTexture, x, y);
+	glGenTextures(1, &skyTexture);
+}
+
+void Renderer::MakeTexture(unsigned char * data,GLuint& texture ,int x, int y)
+{
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
 
 }
 
@@ -325,8 +333,12 @@ void Renderer::FragmentSpline(float time)
 {
 	glUseProgram(m_SolidRectShader);
 
-	GLuint uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot");
+	GLuint uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot1");
 	glUniform1i(uniformSampler, 0);
+
+	uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot2");
+	glUniform1i(uniformSampler, 1);
+
 
 	int uniformTime = glGetUniformLocation(m_SolidRectShader, "u_time");
 	glUniform1i(uniformTime,index);
@@ -341,9 +353,10 @@ void Renderer::FragmentSpline(float time)
 	glUseProgram(m_SolidRectShader);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gTextureIDTotal);
+	glBindTexture(GL_TEXTURE_2D, brickTexture);
 
-
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, skyTexture);
 
 
 

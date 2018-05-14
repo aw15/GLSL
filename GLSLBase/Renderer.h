@@ -39,7 +39,7 @@ private:
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 	GLuint CompileShaders(char* filenameVS, char* filenameFS);
 	void CreateBufferObjects();
-	
+	void MakeTexture(unsigned char * data, GLuint& texture, int x, int y);
 
 	bool m_Initialized = false;
 	
