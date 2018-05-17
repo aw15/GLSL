@@ -9,34 +9,11 @@ uniform sampler2D u_TextureSlot2;
 
 void main()
 {
-	float tx = fract(v_uv.x*10);
-	float ty = fract(v_uv.y*10);
-	vec4 t2 = texture(u_TextureSlot1, vec2(tx,ty)).bgra;
-
+//텍스쳐는 좌표로 출력하며 생각해볼것.
+//2얼마나 비껴나갈지, 3은 반복획수 
+	float tx = fract((floor(v_uv.y*3)/2) + (v_uv.x*3)); //0 0.5 0
+	float ty = fract(v_uv.y*3);
+	vec4 t2 = texture(u_TextureSlot2, vec2(tx,ty)).bgra;
+	FragColor = vec4(tx,ty,0,1);
 	FragColor = t2;
-
-	//FragColor = vec4(tx,ty,0,1);
-
-	//빗금 치기! 이동시키는거 해보자
-	/*
-	
-	vec4 t1 = texture(u_TextureSlot1, v_uv).bgra;
-	vec4 t2 = texture(u_TextureSlot2, v_uv).bgra;
-
-	float newx = v_uv.x*3.141592*2;
-	float newy = v_uv.y*2-1;
-
-	if(sin(newx)>newy)
-	{
-		FragColor = t1;
-	}
-	else
-	{
-		FragColor = t2;//스위즐링을 통해 채널을 바꿔준것
-	}
-
-
-	float newnewY = v_uv.y*3.141592*12;
-	float greyScale = sin(newnewY);
-	FragColor += vec4(greyScale);*/
 } 

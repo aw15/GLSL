@@ -190,12 +190,10 @@ void Renderer::CreateBufferObjects()
 	unsigned int y = 0;
 	unsigned char* brick = loadBMPRaw("brick.bmp", x, y);
 	MakeTexture(brick, brickTexture, x, y);
-
 	x = 0;
 	y = 0;
 	unsigned char* sky = loadBMPRaw("sky.bmp", x, y);
 	MakeTexture(sky, skyTexture, x, y);
-	glGenTextures(1, &skyTexture);
 }
 
 void Renderer::MakeTexture(unsigned char * data,GLuint& texture ,int x, int y)
