@@ -10,6 +10,9 @@
     <ClCompile Include="GLSLBase.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="LoadPng.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -21,18 +24,15 @@
     <ClInclude Include="targetver.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="LoadPng.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\SolidRect.vs">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\SolidRect.ps">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\FillAll.ps">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\FillAll.vs">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

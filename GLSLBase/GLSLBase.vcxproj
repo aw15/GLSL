@@ -156,11 +156,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LoadPng.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LoadPng.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="GLSLBase.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -171,8 +173,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\FillAll.ps" />
-    <None Include="Shaders\FillAll.vs" />
     <None Include="Shaders\SolidRect.ps" />
     <None Include="Shaders\SolidRect.vs" />
   </ItemGroup>

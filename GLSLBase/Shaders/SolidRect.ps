@@ -1,19 +1,10 @@
 #version 330
 
 layout(location=0) out vec4 FragColor;
-in vec2 v_uv;
 
-uniform int u_time;
 uniform sampler2D u_TextureSlot1;
-uniform sampler2D u_TextureSlot2;
 
 void main()
 {
-//텍스쳐는 좌표로 출력하며 생각해볼것.
-//2얼마나 비껴나갈지, 3은 반복획수 
-	float tx = fract((floor(v_uv.y*3)/2) + (v_uv.x*3)); //0 0.5 0
-	float ty = fract(v_uv.y*3);
-	vec4 t2 = texture(u_TextureSlot2, vec2(tx,ty)).bgra;
-	FragColor = vec4(tx,ty,0,1);
-	FragColor = t2;
-} 
+	FragColor = texture(u_TextureSlot1,gl_PointCoord);
+}

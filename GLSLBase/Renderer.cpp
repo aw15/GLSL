@@ -1,6 +1,27 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include<chrono>
+const float pointCount = 10;
+
+GLuint Renderer::CreatePngTexture(char * filePath)
+{
+
+	GLuint temp;
+	glGenTextures(1, &temp);
+
+	//Load Pngs
+	// Load file and decode image.
+	std::vector<unsigned char> image;
+	unsigned width, height;
+	unsigned error = lodepng::decode(image, width, height, filePath);
+
+	glBindTexture(GL_TEXTURE_2D, temp);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
+
+	return temp;
+}
 
 unsigned char * loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight)
 {
@@ -110,81 +131,41 @@ bool Renderer::IsInitialized()
 
 void Renderer::CreateBufferObjects()
 {
-	points[0] = { -0.5f,0.5f,0.0f,0.0f,1.0f };
-	points[1] = { -0.5f,-0.5f,0.0f,0.0f,0.0f };
-	points[2] = { 0.5f,0.5f,0.0f,1.0f,1.0f };
-	points[3] = { 0.5f,0.5f,0.0f,1.0f,1.0f };
-	points[4] = { -0.5f,-0.5f,0.0f,0.0f,0.0f };
-	points[5] = { 0.5f,-0.5f,0.0f,1.0f,0.0f };
+	float* Points = new float[(pointCount + 1) * 4];
+	for (int i = 0; i <= pointCount; i++)
+	{
+		Points[i * 4 + 0] = (i / (float)pointCount) * 2 - 1;
+		Points[i * 4 + 1] = (float)rand() / (float)RAND_MAX;
+		Points[i * 4 + 2] = (float)rand() / (float)RAND_MAX;
+		Points[i * 4 + 3] = 1;
+		if ((float)rand() / (float)RAND_MAX > 0.5f)
+		{
+			Points[i * 4 + 0] *= -1;
+		}
+	}
+
+	//float point[4] = { -1,0,0,1 };
 
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-	Sleep(200);
-	GLulong textureSmileTotal[]
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * (pointCount + 1), Points, GL_STATIC_DRAW);
+
+
+	float square[]
 		=
 	{
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF,
-		0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
-		0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
-		0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
-		0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-
-		0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00,
-		0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
-		0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-
-		0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00,
-		0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
-		0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-
-		0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00,
-		0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00,
-		0xFFFFFFFF, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFF0000,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+		-1.0f,-1.0f,0.0f,1.0f,
+		-1.0f,1.0f,0.0f,1.0f,
+		1.0f,1.0f,0.0f,1.0f,
+		1.0f,1.0f,0.0f,1.0f,
+		1.0f,-1.0f,0.0f,1.0f,
+		-1.0f,-1.0f,0.0f,1.0f
 	};
-	glGenTextures(1, &gTextureIDTotal);
-	glBindTexture(GL_TEXTURE_2D, gTextureIDTotal);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 48, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureSmileTotal);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+
+	glGenBuffers(1, &m_FillAll);
+	glBindBuffer(GL_ARRAY_BUFFER, m_FillAll);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
 
 	unsigned int x = 0;
 	unsigned int y = 0;
@@ -194,6 +175,9 @@ void Renderer::CreateBufferObjects()
 	y = 0;
 	unsigned char* sky = loadBMPRaw("sky.bmp", x, y);
 	MakeTexture(sky, skyTexture, x, y);
+
+
+	particleTexture=CreatePngTexture("particle.png");
 }
 
 void Renderer::MakeTexture(unsigned char * data,GLuint& texture ,int x, int y)
@@ -205,7 +189,6 @@ void Renderer::MakeTexture(unsigned char * data,GLuint& texture ,int x, int y)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
 }
 
 void Renderer::ProcessInput(float x, float y)
@@ -325,54 +308,62 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 	return ShaderProgram;
 }
 
-int index = 0;
+float g_time = 0;
 
 void Renderer::FragmentSpline(float time)
 {
+	
 	glUseProgram(m_SolidRectShader);
+
+	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_time");
+	g_time += 0.002f;
+
+	glUniform1f(id, g_time);
+
+	id = glGetUniformLocation(m_SolidRectShader, "origin");
+	glUniform2f(id, 0, 0);
+	id = glGetUniformLocation(m_SolidRectShader, "end");
+	glUniform2f(id, m_mouseX, m_mouseY);
 
 	GLuint uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot1");
 	glUniform1i(uniformSampler, 0);
-
-	uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot2");
-	glUniform1i(uniformSampler, 1);
-
-
-	int uniformTime = glGetUniformLocation(m_SolidRectShader, "u_time");
-	glUniform1i(uniformTime,index);
-	Sleep(200);
-	index++;
-	if (index > 5)
-	{
-		index = 0;
-	}
-
-
-	glUseProgram(m_SolidRectShader);
-
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, brickTexture);
+	glBindTexture(GL_TEXTURE_2D, particleTexture);
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, skyTexture);
+	glPointSize(1.0f);
 
-
-
-	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-	int attribUV = glGetAttribLocation(m_SolidRectShader, "a_uv");
-	glEnableVertexAttribArray(attribPosition);//꼭 enable해서 활성화하자
-	glEnableVertexAttribArray(attribUV);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), 0);
-	glVertexAttribPointer(attribUV, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(3 * sizeof(float)));
-
-
-
-	glDrawArrays(GL_TRIANGLES, 0, POINT_COUNT);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_POINT_SPRITE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDrawArrays(GL_POINTS, 0, pointCount);
 
 	glDisableVertexAttribArray(attribPosition);
-	glDisableVertexAttribArray(attribUV);
-
 //	Sleep(1000);
+}
+
+void Renderer::FillAll(float r, float g, float b, float a)
+{
+	glUseProgram(m_FillAllShader);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	int attribPosition = glGetAttribLocation(m_FillAllShader, "a_Position");
+
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	GLuint id = glGetUniformLocation(m_FillAllShader, "u_color");
+	glUniform4f(id, r, g, b, a);
+
+	glDisableVertexAttribArray(attribPosition);
+	glDisable(GL_BLEND);
 }
