@@ -2,9 +2,13 @@
 
 layout(location=0) out vec4 FragColor;
 
+
 uniform sampler2D u_TextureSlot1;
 
+in vec2 position;
+
+
 void main()
-{
-	FragColor = texture(u_TextureSlot1,gl_PointCoord);
+{	
+	FragColor = texture(u_TextureSlot1,position).bgra;
 }

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include<chrono>
-const float pointCount = 10;
+int gDummyVertexCount;
 
 GLuint Renderer::CreatePngTexture(char * filePath)
 {
@@ -131,53 +131,86 @@ bool Renderer::IsInitialized()
 
 void Renderer::CreateBufferObjects()
 {
-	float* Points = new float[(pointCount + 1) * 4];
-	for (int i = 0; i <= pointCount; i++)
+	float basePosX = -0.5f;
+	float basePosY = -0.5f;
+	float targetPosX = 0.5f;
+	float targetPosY = 0.5f;
+
+	int pointCountX = 20;
+	int pointCountY = 20;
+
+	float width = targetPosX - basePosX;
+	float height = targetPosY - basePosY;
+
+	float* point = new float[pointCountX*pointCountY * 2];
+	float* vertices = new float[(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3];
+	gDummyVertexCount = (pointCountX - 1)*(pointCountY - 1) * 2 * 3;
+
+	//Prepare points
+	for (int x = 0; x < pointCountX; x++)
 	{
-		Points[i * 4 + 0] = (i / (float)pointCount) * 2 - 1;
-		Points[i * 4 + 1] = (float)rand() / (float)RAND_MAX;
-		Points[i * 4 + 2] = (float)rand() / (float)RAND_MAX;
-		Points[i * 4 + 3] = 1;
-		if ((float)rand() / (float)RAND_MAX > 0.5f)
+		for (int y = 0; y < pointCountY; y++)
 		{
-			Points[i * 4 + 0] *= -1;
+			point[(y*pointCountX + x) * 2 + 0] = basePosX + width * (x / (float)(pointCountX - 1));
+			point[(y*pointCountX + x) * 2 + 1] = basePosY + height * (y / (float)(pointCountY - 1));
 		}
 	}
 
-	//float point[4] = { -1,0,0,1 };
-
-	glGenBuffers(1, &m_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * (pointCount + 1), Points, GL_STATIC_DRAW);
-
-
-	float square[]
-		=
+	//Make triangles
+	int vertIndex = 0;
+	for (int x = 0; x < pointCountX - 1; x++)
 	{
-		-1.0f,-1.0f,0.0f,1.0f,
-		-1.0f,1.0f,0.0f,1.0f,
-		1.0f,1.0f,0.0f,1.0f,
-		1.0f,1.0f,0.0f,1.0f,
-		1.0f,-1.0f,0.0f,1.0f,
-		-1.0f,-1.0f,0.0f,1.0f
-	};
+		for (int y = 0; y < pointCountY - 1; y++)
+		{
+			//Triangle part 1
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + x) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + x) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
 
-
-	glGenBuffers(1, &m_FillAll);
-	glBindBuffer(GL_ARRAY_BUFFER, m_FillAll);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-
-	unsigned int x = 0;
-	unsigned int y = 0;
-	unsigned char* brick = loadBMPRaw("brick.bmp", x, y);
-	MakeTexture(brick, brickTexture, x, y);
-	x = 0;
-	y = 0;
+			//Triangle part 2
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + (x + 1)) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[(y*pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++;
+		}
+	}
+	unsigned int x = 0, y = 0;
 	unsigned char* sky = loadBMPRaw("sky.bmp", x, y);
 	MakeTexture(sky, skyTexture, x, y);
 
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3, vertices, GL_STATIC_DRAW);
 
-	particleTexture=CreatePngTexture("particle.png");
 }
 
 void Renderer::MakeTexture(unsigned char * data,GLuint& texture ,int x, int y)
@@ -315,36 +348,28 @@ void Renderer::FragmentSpline(float time)
 	
 	glUseProgram(m_SolidRectShader);
 
-	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	int attrribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
 
-	glEnableVertexAttribArray(attribPosition);
+	glEnableVertexAttribArray(attrribPosition);
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glVertexAttribPointer(attribPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	GLuint id = glGetUniformLocation(m_SolidRectShader, "u_time");
-	g_time += 0.002f;
-
-	glUniform1f(id, g_time);
-
-	id = glGetUniformLocation(m_SolidRectShader, "origin");
-	glUniform2f(id, 0, 0);
-	id = glGetUniformLocation(m_SolidRectShader, "end");
-	glUniform2f(id, m_mouseX, m_mouseY);
+	glVertexAttribPointer(attrribPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot1");
 	glUniform1i(uniformSampler, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, particleTexture);
+	glBindTexture(GL_TEXTURE_2D, skyTexture);
 
-	glPointSize(1.0f);
+	auto id = glGetUniformLocation(m_SolidRectShader, "u_time");
+	glUniform1f(id,g_time);
+	g_time += 0.005f;
+	glDrawArrays(GL_TRIANGLES, 0, gDummyVertexCount);
 
-	glEnable(GL_PROGRAM_POINT_SIZE);
-	glEnable(GL_POINT_SPRITE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDrawArrays(GL_POINTS, 0, pointCount);
 
-	glDisableVertexAttribArray(attribPosition);
+	glDisableVertexAttribArray(attrribPosition);
+
+	
+
 //	Sleep(1000);
 }
 
