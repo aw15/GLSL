@@ -10,15 +10,6 @@
 #define PI 3.141592
 
 
-struct VertexData
-{
-	float x;
-	float y;
-	float z;
-	float u;
-	float v;
-};
-
 
 
 
@@ -59,7 +50,5 @@ private:
 	GLuint skyTexture = 0;
 	GLuint particleTexture = 0;
 
-	char* data;
-	VertexData points[POINT_COUNT];
 };
 

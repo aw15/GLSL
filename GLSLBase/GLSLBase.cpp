@@ -22,7 +22,7 @@ auto start = chrono::high_resolution_clock::now();
 void RenderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.1f);
 
 	auto end = chrono::high_resolution_clock::now();
 	chrono::duration<double> diff = end - start;

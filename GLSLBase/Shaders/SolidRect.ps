@@ -1,14 +1,19 @@
 #version 330
 
-layout(location=0) out vec4 FragColor;
+in vec2 vTexPos;
+in float vAlpha;
 
+out vec4 FragColor;
 
-uniform sampler2D u_TextureSlot1;
-
-in vec2 position;
-
+uniform sampler2D uTexture;
 
 void main()
-{	
-	FragColor = texture(u_TextureSlot1,position).bgra;
+{
+	//FragColor = vec4(1);
+    vec4 texColor = texture(uTexture, vTexPos);
+
+	texColor.a = texColor.a * vAlpha;
+
+	FragColor = texColor;
+
 }

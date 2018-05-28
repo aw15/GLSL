@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include<chrono>
-int gDummyVertexCount;
 
 GLuint Renderer::CreatePngTexture(char * filePath)
 {
@@ -113,12 +112,6 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	{
 		m_Initialized = true;
 	}
-/*
-	Bullet* bullet = new Bullet{ 0.01f,0.75f, 0.0f,0.0f };
-	Bullet* bullet2 = new Bullet{ 0.005f,0.35f, 0.0f,0.0f };
-	bullets.push_back(bullet);
-	bullets.push_back(bullet2);*/
-
 
 }
 
@@ -127,90 +120,163 @@ bool Renderer::IsInitialized()
 	return m_Initialized;
 }
 
+struct VertexData
+{
+	float x, y, z;
+	float r, g, b, a;
+};
 
+int gParticleVertexCount = 0;
 
 void Renderer::CreateBufferObjects()
 {
-	float basePosX = -0.5f;
-	float basePosY = -0.5f;
-	float targetPosX = 0.5f;
-	float targetPosY = 0.5f;
 
-	int pointCountX = 20;
-	int pointCountY = 20;
+	int particleCount = 1000;//총 500개의 파티클
+	float particleSize = 0.05f;
+	float particleInitPosX = 0;
+	float particleInitPosY = 0;//0~0.25에서 생성
 
-	float width = targetPosX - basePosX;
-	float height = targetPosY - basePosY;
+	float* particleVertices = new float[particleCount * 2 * 3 * (3 + 2 + 4)];
+	int particleFloatCount = particleCount * 2 * 3 * (3 + 2 + 4);
+	gParticleVertexCount = particleCount * 2 * 3;//사각형이니까 삼각형 2개
 
-	float* point = new float[pointCountX*pointCountY * 2];
-	float* vertices = new float[(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3];
-	gDummyVertexCount = (pointCountX - 1)*(pointCountY - 1) * 2 * 3;
+	int particleVertIndex = 0;
 
-	//Prepare points
-	for (int x = 0; x < pointCountX; x++)
+	for (int i = 0; i < particleCount; i++)
 	{
-		for (int y = 0; y < pointCountY; y++)
-		{
-			point[(y*pointCountX + x) * 2 + 0] = basePosX + width * (x / (float)(pointCountX - 1));
-			point[(y*pointCountX + x) * 2 + 1] = basePosY + height * (y / (float)(pointCountY - 1));
-		}
-	}
+		float randomValueX = 0.f;
+		float randomValueY = 0.f;
+		float randomValueZ = 0.f;
+		float randomStartTime = 0.f;
+		float velocityScale = 0.5f;//눈이라면 속도를 0.1
 
-	//Make triangles
-	int vertIndex = 0;
-	for (int x = 0; x < pointCountX - 1; x++)
-	{
-		for (int y = 0; y < pointCountY - 1; y++)
-		{
-			//Triangle part 1
-			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 0];
-			vertIndex++;
-			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 1];
-			vertIndex++;
-			vertices[vertIndex] = 0.f;
-			vertIndex++;
-			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 0];
-			vertIndex++;
-			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 1];
-			vertIndex++;
-			vertices[vertIndex] = 0.f;
-			vertIndex++;
-			vertices[vertIndex] = point[((y + 1)*pointCountX + x) * 2 + 0];
-			vertIndex++;
-			vertices[vertIndex] = point[((y + 1)*pointCountX + x) * 2 + 1];
-			vertIndex++;
-			vertices[vertIndex] = 0.f;
-			vertIndex++;
+		randomValueX = (rand() / (float)RAND_MAX - 0.5)*velocityScale;//-0.5~0.5사이
+		randomValueY = (rand() / (float)RAND_MAX - 0.5)*velocityScale;
+		randomValueZ = 0.f;
+		randomStartTime = (rand() / (float)RAND_MAX)*20.f;//스타트 시간.
 
-			//Triangle part 2
-			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 0];
-			vertIndex++;
-			vertices[vertIndex] = point[(y*pointCountX + x) * 2 + 1];
-			vertIndex++;
-			vertices[vertIndex] = 0.f;
-			vertIndex++;
-			vertices[vertIndex] = point[(y*pointCountX + (x + 1)) * 2 + 0];
-			vertIndex++;
-			vertices[vertIndex] = point[(y*pointCountX + (x + 1)) * 2 + 1];
-			vertIndex++;
-			vertices[vertIndex] = 0.f;
-			vertIndex++;
-			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 0];
-			vertIndex++;
-			vertices[vertIndex] = point[((y + 1)*pointCountX + (x + 1)) * 2 + 1];
-			vertIndex++;
-			vertices[vertIndex] = 0.f;
-			vertIndex++;
-		}
+		//particleInitPosX = (rand() / (float)RAND_MAX * 2 - 1);
+		//particleInitPosY = (rand() / (float)RAND_MAX * 2 - 1);//시작위치를 랜덤으로 주면 화면전체에 나온다.
+
+		particleVertices[particleVertIndex] = -particleSize / 2.f + particleInitPosX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = -particleSize / 2.f + particleInitPosY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueZ;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomStartTime;
+		particleVertIndex++;
+
+		particleVertices[particleVertIndex] = particleSize / 2.f + particleInitPosX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = -particleSize / 2.f + particleInitPosY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 1.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueZ;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomStartTime;
+		particleVertIndex++;
+
+		particleVertices[particleVertIndex] = particleSize / 2.f + particleInitPosX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = particleSize / 2.f + particleInitPosY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 1.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 1.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueZ;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomStartTime;
+		particleVertIndex++;
+
+		particleVertices[particleVertIndex] = -particleSize / 2.f + particleInitPosX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = -particleSize / 2.f + particleInitPosY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueZ;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomStartTime;
+		particleVertIndex++;
+
+		particleVertices[particleVertIndex] = particleSize / 2.f + particleInitPosX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = particleSize / 2.f + particleInitPosY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 1.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 1.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueZ;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomStartTime;
+		particleVertIndex++;
+
+		particleVertices[particleVertIndex] = -particleSize / 2.f + particleInitPosX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = particleSize / 2.f + particleInitPosY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 0.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = 1.f;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueX;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueY;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomValueZ;
+		particleVertIndex++;
+		particleVertices[particleVertIndex] = randomStartTime;
+		particleVertIndex++;
 	}
-	unsigned int x = 0, y = 0;
-	unsigned char* sky = loadBMPRaw("sky.bmp", x, y);
-	MakeTexture(sky, skyTexture, x, y);
+	GLuint particleTexture = CreatePngTexture("particle.png");
 
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(pointCountX - 1)*(pointCountY - 1) * 2 * 3 * 3, vertices, GL_STATIC_DRAW);
-
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*particleFloatCount, particleVertices, GL_STATIC_DRAW);
 }
 
 void Renderer::MakeTexture(unsigned char * data,GLuint& texture ,int x, int y)
@@ -347,26 +413,39 @@ void Renderer::FragmentSpline(float time)
 {
 	
 	glUseProgram(m_SolidRectShader);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-	int attrribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	int attribPosition = glGetAttribLocation(m_SolidRectShader, "Position");
+	int a_texpos = glGetAttribLocation(m_SolidRectShader, "TexPos");
+	int a_velocity = glGetAttribLocation(m_SolidRectShader, "Velocity");
 
-	glEnableVertexAttribArray(attrribPosition);
+	glEnableVertexAttribArray(attribPosition);
+	glEnableVertexAttribArray(a_texpos);
+	glEnableVertexAttribArray(a_velocity);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glVertexAttribPointer(attrribPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glVertexAttribPointer(a_texpos, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 3));
+	glVertexAttribPointer(a_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 5));
 
-	GLuint uniformSampler = glGetUniformLocation(m_SolidRectShader, "u_TextureSlot1");
-	glUniform1i(uniformSampler, 0);
+	int uniformTime = glGetUniformLocation(m_SolidRectShader, "uTime");
+	glUniform1f(uniformTime, g_time);
+	g_time += 0.001;
+	
+	int uniformTexture = glGetUniformLocation(m_SolidRectShader, "uTexture");
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, skyTexture);
-
-	auto id = glGetUniformLocation(m_SolidRectShader, "u_time");
-	glUniform1f(id,g_time);
-	g_time += 0.005f;
-	glDrawArrays(GL_TRIANGLES, 0, gDummyVertexCount);
+	glBindTexture(GL_TEXTURE_2D, m_SolidRectShader);
+	glUniform1i(uniformTexture, 0);
 
 
-	glDisableVertexAttribArray(attrribPosition);
+	
+	glDrawArrays(GL_TRIANGLES, 0, gParticleVertexCount);
+
+
+	glDisableVertexAttribArray(attribPosition);
+	glDisableVertexAttribArray(a_texpos);
+	glDisableVertexAttribArray(a_velocity);
 
 	
 
