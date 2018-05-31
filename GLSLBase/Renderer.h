@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include"glm\gtc\matrix_transform.hpp"
+#include"glm/glm.hpp"
 #include"LoadPng.h"
 #include "Dependencies\glew.h"
 #define POINT_COUNT 6
@@ -50,5 +52,13 @@ private:
 	GLuint skyTexture = 0;
 	GLuint particleTexture = 0;
 
+	glm::vec3 m_v3Camera_Position;
+	glm::vec3 m_v3Camera_Lookat;
+	glm::vec3 m_v3Camera_Up;
+
+	glm::mat4 m_m4OrthoProj;
+	glm::mat4 m_m4View;
+	glm::mat4 m_m4ProjView;
+	glm::mat4 m_m4WorldMatrix;
 };
 

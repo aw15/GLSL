@@ -1,28 +1,17 @@
 #version 330
 
-in vec3 Position;
-in vec2 TexPos;
-in vec4 Velocity;
-
-uniform float uTime;
-
-out vec2 vTexPos;
-out float vAlpha;
-const vec3 gravity = vec3(0, -0.4, 0);
+in vec3 a_Position;
+in vec3 a_Normal;
+in vec4 a_Color;
+uniform float u_time;
+uniform mat4 u_ProjView;
+out vec4 v_Color;
 
 void main()
 {
-	vec3 newPos = vec3(-100,-100,-100);
-	float newTime = uTime - Velocity.w;
-	float alpha = 1;
-	if(newTime>0)
-	{
-		newTime = fract(newTime/2)*2;
-		alpha = 1 - fract(newTime/2);
-		newPos = Position.xyz + Velocity.xyx * newTime + 0.5*gravity*newTime*newTime;
-		gl_Position = vec4(newPos.xyz, 1.0);
-		vTexPos = TexPos;
-	}
-	vAlpha = alpha;
-
+  gl_Position = u_ProjView * vec4(a_Position, 1.f);
+  v_Color = a_Color;
 }
+
+
+
