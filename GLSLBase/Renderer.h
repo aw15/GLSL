@@ -52,13 +52,17 @@ private:
 	GLuint skyTexture = 0;
 	GLuint particleTexture = 0;
 
-	glm::vec3 m_v3Camera_Position;
-	glm::vec3 m_v3Camera_Lookat;
-	glm::vec3 m_v3Camera_Up;
+	glm::vec3 m_v3CameraPos;
+	glm::vec3 m_v3CameraLookat;
+	glm::vec3 m_v3CameraUp;
 
-	glm::mat4 m_m4OrthoProj;
+	glm::mat4 m_m4Proj;
 	glm::mat4 m_m4View;
 	glm::mat4 m_m4ProjView;
-	glm::mat4 m_m4WorldMatrix;
+
+
+	glm::mat4 m_m4ModelTranslate;
+	glm::mat4 m_m4ModelRotate;
+	glm::mat4 m_m4ModelScale;
 };
 
